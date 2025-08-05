@@ -1,27 +1,20 @@
 package calculator
 
 import (
-	"encoding/json"
 	"net/http"
-	"strconv"
 
 	"github.com/gorilla/mux"
+	"github.com/paulorobertouri/go-template/internal/common"
 )
-
-// Request represents a calculation request
-type Request struct {
-	A float64 `json:"a"`
-	B float64 `json:"b"`
-}
 
 // Response represents a calculation response
 type Response struct {
 	Result float64 `json:"result"`
-	Error  string  `json:"error,omitempty"`
 }
 
 // Handler handles calculator HTTP requests
 type Handler struct {
+	common.BaseHandler
 	calc *Calculator
 }
 
@@ -34,10 +27,16 @@ func NewHandler() *Handler {
 
 // RegisterRoutes registers calculator routes
 func (h *Handler) RegisterRoutes(router *mux.Router) {
-	router.HandleFunc("/add/{a}/{b}", h.handleAdd).Methods("GET")
-	router.HandleFunc("/subtract/{a}/{b}", h.handleSubtract).Methods("GET")
-	router.HandleFunc("/multiply/{a}/{b}", h.handleMultiply).Methods("GET")
-	router.HandleFunc("/divide/{a}/{b}", h.handleDivide).Methods("GET")
+	routes := common.RouteGroup{
+		Prefix: "",
+		Routes: []common.Route{
+			common.NamedRoute("/add/{a}/{b}", "GET", "calculator.add", h.handleAdd),
+			common.NamedRoute("/subtract/{a}/{b}", "GET", "calculator.subtract", h.handleSubtract),
+			common.NamedRoute("/multiply/{a}/{b}", "GET", "calculator.multiply", h.handleMultiply),
+			common.NamedRoute("/divide/{a}/{b}", "GET", "calculator.divide", h.handleDivide),
+		},
+	}
+	common.RegisterGroup(router, routes)
 }
 
 // handleAdd handles addition
@@ -49,16 +48,16 @@ func (h *Handler) RegisterRoutes(router *mux.Router) {
 // @Param a path number true "First number"
 // @Param b path number true "Second number"
 // @Success 200 {object} Response
-// @Failure 400 {object} Response
+// @Failure 400 {object} common.ErrorResponse
 // @Router /add/{a}/{b} [get]
 func (h *Handler) handleAdd(w http.ResponseWriter, r *http.Request) {
 	a, b, err := h.getNumbers(r)
 	if err != nil {
-		h.writeError(w, err.Error())
+		h.WriteBadRequest(w, err.Error())
 		return
 	}
 	result := h.calc.Add(a, b)
-	h.writeResult(w, result)
+	h.WriteSuccess(w, Response{Result: result})
 }
 
 // handleSubtract handles subtraction
@@ -70,16 +69,16 @@ func (h *Handler) handleAdd(w http.ResponseWriter, r *http.Request) {
 // @Param a path number true "First number (minuend)"
 // @Param b path number true "Second number (subtrahend)"
 // @Success 200 {object} Response
-// @Failure 400 {object} Response
+// @Failure 400 {object} common.ErrorResponse
 // @Router /subtract/{a}/{b} [get]
 func (h *Handler) handleSubtract(w http.ResponseWriter, r *http.Request) {
 	a, b, err := h.getNumbers(r)
 	if err != nil {
-		h.writeError(w, err.Error())
+		h.WriteBadRequest(w, err.Error())
 		return
 	}
 	result := h.calc.Subtract(a, b)
-	h.writeResult(w, result)
+	h.WriteSuccess(w, Response{Result: result})
 }
 
 // handleMultiply handles multiplication
@@ -91,16 +90,16 @@ func (h *Handler) handleSubtract(w http.ResponseWriter, r *http.Request) {
 // @Param a path number true "First number"
 // @Param b path number true "Second number"
 // @Success 200 {object} Response
-// @Failure 400 {object} Response
+// @Failure 400 {object} common.ErrorResponse
 // @Router /multiply/{a}/{b} [get]
 func (h *Handler) handleMultiply(w http.ResponseWriter, r *http.Request) {
 	a, b, err := h.getNumbers(r)
 	if err != nil {
-		h.writeError(w, err.Error())
+		h.WriteBadRequest(w, err.Error())
 		return
 	}
 	result := h.calc.Multiply(a, b)
-	h.writeResult(w, result)
+	h.WriteSuccess(w, Response{Result: result})
 }
 
 // handleDivide handles division
@@ -112,48 +111,35 @@ func (h *Handler) handleMultiply(w http.ResponseWriter, r *http.Request) {
 // @Param a path number true "Dividend"
 // @Param b path number true "Divisor (cannot be zero)"
 // @Success 200 {object} Response
-// @Failure 400 {object} Response
+// @Failure 400 {object} common.ErrorResponse
 // @Router /divide/{a}/{b} [get]
 func (h *Handler) handleDivide(w http.ResponseWriter, r *http.Request) {
 	a, b, err := h.getNumbers(r)
 	if err != nil {
-		h.writeError(w, err.Error())
+		h.WriteBadRequest(w, err.Error())
 		return
 	}
 	result, err := h.calc.Divide(a, b)
 	if err != nil {
-		h.writeError(w, err.Error())
+		h.WriteBadRequest(w, err.Error())
 		return
 	}
-	h.writeResult(w, result)
+	h.WriteSuccess(w, Response{Result: result})
 }
 
 // getNumbers extracts numbers from URL parameters
 func (h *Handler) getNumbers(r *http.Request) (float64, float64, error) {
-	vars := mux.Vars(r)
+	params := h.GetURLParams(r)
 
-	a, err := strconv.ParseFloat(vars["a"], 64)
+	a, err := params.Float64("a")
 	if err != nil {
 		return 0, 0, err
 	}
 
-	b, err := strconv.ParseFloat(vars["b"], 64)
+	b, err := params.Float64("b")
 	if err != nil {
 		return 0, 0, err
 	}
 
 	return a, b, nil
-}
-
-// writeResult writes a successful result
-func (h *Handler) writeResult(w http.ResponseWriter, result float64) {
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(Response{Result: result})
-}
-
-// writeError writes an error response
-func (h *Handler) writeError(w http.ResponseWriter, errMsg string) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusBadRequest)
-	json.NewEncoder(w).Encode(Response{Error: errMsg})
 }

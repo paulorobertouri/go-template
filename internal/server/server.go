@@ -5,15 +5,19 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/paulorobertouri/go-template/internal/calculator"
+	"github.com/paulorobertouri/go-template/internal/common"
+	"github.com/paulorobertouri/go-template/internal/greeting"
 	"github.com/paulorobertouri/go-template/internal/user"
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 // Server represents the HTTP server
 type Server struct {
+	common.BaseHandler
 	router            *mux.Router
 	calculatorHandler *calculator.Handler
 	userHandler       *user.Handler
+	greetingHandler   *greeting.Handler
 }
 
 // New creates a new server instance
@@ -25,6 +29,7 @@ func New() *Server {
 		router:            mux.NewRouter(),
 		calculatorHandler: calculator.NewHandler(),
 		userHandler:       user.NewHandler(userService),
+		greetingHandler:   greeting.NewHandler(),
 	}
 
 	s.setupRoutes()
@@ -45,11 +50,10 @@ func (s *Server) setupRoutes() {
 	// Swagger UI
 	s.router.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
 
-	// Register calculator routes
+	// Register all handlers
 	s.calculatorHandler.RegisterRoutes(s.router)
-
-	// Register user routes
 	s.userHandler.RegisterRoutes(s.router)
+	s.greetingHandler.RegisterRoutes(s.router)
 }
 
 // handleHealth handles health check requests
@@ -61,9 +65,7 @@ func (s *Server) setupRoutes() {
 // @Success 200 {object} map[string]string
 // @Router /health [get]
 func (s *Server) handleHealth(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(`{"status": "ok"}`))
+	s.WriteSuccess(w, map[string]string{"status": "ok"})
 }
 
 // handleRoot handles root requests
@@ -75,7 +77,5 @@ func (s *Server) handleHealth(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {object} map[string]string
 // @Router / [get]
 func (s *Server) handleRoot(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(`{"message": "Welcome to the Go Template API"}`))
+	s.WriteSuccess(w, map[string]string{"message": "Welcome to the Go Template API"})
 }

@@ -67,6 +67,12 @@ lint:
 	@echo "Linting code..."
 	golangci-lint run
 
+# Swagger generation
+swagger:
+	@echo "Generating Swagger documentation..."
+	~/go/bin/swag init -g cmd/api/main.go
+
+
 # Show help
 help:
 	@echo "Available targets:"

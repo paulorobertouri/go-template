@@ -1,17 +1,10 @@
 package user
 
 import (
-	"encoding/json"
 	"net/http"
-	"strconv"
 
 	"github.com/gorilla/mux"
-)
-
-const (
-	usersPath        = "/users"
-	usersIDPath      = "/users/{id}"
-	invalidUserIDMsg = "invalid user ID"
+	"github.com/paulorobertouri/go-template/internal/common"
 )
 
 // CreateUserRequest represents a user creation request
@@ -20,13 +13,9 @@ type CreateUserRequest struct {
 	Email string `json:"email"`
 }
 
-// ErrorResponse represents an error response
-type ErrorResponse struct {
-	Error string `json:"error"`
-}
-
 // Handler handles user HTTP requests
 type Handler struct {
+	common.BaseHandler
 	service *Service
 }
 
@@ -39,11 +28,17 @@ func NewHandler(service *Service) *Handler {
 
 // RegisterRoutes registers user routes
 func (h *Handler) RegisterRoutes(router *mux.Router) {
-	router.HandleFunc(usersPath, h.handleGetAllUsers).Methods("GET")
-	router.HandleFunc(usersIDPath, h.handleGetUser).Methods("GET")
-	router.HandleFunc(usersPath, h.handleCreateUser).Methods("POST")
-	router.HandleFunc(usersIDPath, h.handleUpdateUser).Methods("PUT")
-	router.HandleFunc(usersIDPath, h.handleDeleteUser).Methods("DELETE")
+	routes := common.RouteGroup{
+		Prefix: "/users",
+		Routes: []common.Route{
+			common.NamedRoute("", "GET", "users.getAll", h.handleGetAllUsers),
+			common.NamedRoute("", "POST", "users.create", h.handleCreateUser),
+			common.NamedRoute("/{id}", "GET", "users.get", h.handleGetUser),
+			common.NamedRoute("/{id}", "PUT", "users.update", h.handleUpdateUser),
+			common.NamedRoute("/{id}", "DELETE", "users.delete", h.handleDeleteUser),
+		},
+	}
+	common.RegisterGroup(router, routes)
 }
 
 // handleGetAllUsers handles GET requests for all users
@@ -56,7 +51,7 @@ func (h *Handler) RegisterRoutes(router *mux.Router) {
 // @Router /users [get]
 func (h *Handler) handleGetAllUsers(w http.ResponseWriter, r *http.Request) {
 	users := h.service.GetAllUsers()
-	h.writeJSON(w, users)
+	h.WriteSuccess(w, users)
 }
 
 // handleGetUser handles GET requests for a specific user
@@ -67,27 +62,27 @@ func (h *Handler) handleGetAllUsers(w http.ResponseWriter, r *http.Request) {
 // @Produce json
 // @Param id path int true "User ID"
 // @Success 200 {object} User
-// @Failure 400 {object} ErrorResponse
-// @Failure 404 {object} ErrorResponse
+// @Failure 400 {object} common.ErrorResponse
+// @Failure 404 {object} common.ErrorResponse
 // @Router /users/{id} [get]
 func (h *Handler) handleGetUser(w http.ResponseWriter, r *http.Request) {
 	id, err := h.getIDFromURL(r)
 	if err != nil {
-		h.writeError(w, invalidUserIDMsg, http.StatusBadRequest)
+		h.WriteBadRequest(w, "invalid user ID")
 		return
 	}
 
 	user, err := h.service.GetUser(id)
 	if err != nil {
 		if err.Error() == ErrUserNotFound {
-			h.writeError(w, err.Error(), http.StatusNotFound)
+			h.WriteNotFound(w, err.Error())
 		} else {
-			h.writeError(w, err.Error(), http.StatusBadRequest)
+			h.WriteBadRequest(w, err.Error())
 		}
 		return
 	}
 
-	h.writeJSON(w, user)
+	h.WriteSuccess(w, user)
 }
 
 // handleCreateUser handles POST requests to create a new user
@@ -98,61 +93,60 @@ func (h *Handler) handleGetUser(w http.ResponseWriter, r *http.Request) {
 // @Produce json
 // @Param user body CreateUserRequest true "User creation request"
 // @Success 201 {object} User
-// @Failure 400 {object} ErrorResponse
+// @Failure 400 {object} common.ErrorResponse
 // @Router /users [post]
 func (h *Handler) handleCreateUser(w http.ResponseWriter, r *http.Request) {
 	var req CreateUserRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		h.writeError(w, "invalid JSON", http.StatusBadRequest)
+	if err := h.ParseJSON(r, &req); err != nil {
+		h.WriteBadRequest(w, "invalid JSON payload")
 		return
 	}
 
 	user, err := h.service.CreateUser(req.Name, req.Email)
 	if err != nil {
-		h.writeError(w, err.Error(), http.StatusBadRequest)
+		h.WriteBadRequest(w, err.Error())
 		return
 	}
 
-	w.WriteHeader(http.StatusCreated)
-	h.writeJSON(w, user)
+	h.WriteCreated(w, user)
 }
 
-// handleUpdateUser handles PUT requests to update a user
+// handleUpdateUser handles PUT requests to update an existing user
 // @Summary Update user by ID
-// @Description Updates an existing user's information
+// @Description Updates an existing user with the provided data
 // @Tags users
 // @Accept json
 // @Produce json
 // @Param id path int true "User ID"
 // @Param user body CreateUserRequest true "User update request"
 // @Success 200 {object} User
-// @Failure 400 {object} ErrorResponse
-// @Failure 404 {object} ErrorResponse
+// @Failure 400 {object} common.ErrorResponse
+// @Failure 404 {object} common.ErrorResponse
 // @Router /users/{id} [put]
 func (h *Handler) handleUpdateUser(w http.ResponseWriter, r *http.Request) {
 	id, err := h.getIDFromURL(r)
 	if err != nil {
-		h.writeError(w, invalidUserIDMsg, http.StatusBadRequest)
+		h.WriteBadRequest(w, "invalid user ID")
 		return
 	}
 
 	var req CreateUserRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		h.writeError(w, "invalid JSON", http.StatusBadRequest)
+	if err := h.ParseJSON(r, &req); err != nil {
+		h.WriteBadRequest(w, "invalid JSON payload")
 		return
 	}
 
 	user, err := h.service.UpdateUser(id, req.Name, req.Email)
 	if err != nil {
 		if err.Error() == ErrUserNotFound {
-			h.writeError(w, err.Error(), http.StatusNotFound)
+			h.WriteNotFound(w, err.Error())
 		} else {
-			h.writeError(w, err.Error(), http.StatusBadRequest)
+			h.WriteBadRequest(w, err.Error())
 		}
 		return
 	}
 
-	h.writeJSON(w, user)
+	h.WriteSuccess(w, user)
 }
 
 // handleDeleteUser handles DELETE requests to delete a user
@@ -163,22 +157,22 @@ func (h *Handler) handleUpdateUser(w http.ResponseWriter, r *http.Request) {
 // @Produce json
 // @Param id path int true "User ID"
 // @Success 204 "No Content"
-// @Failure 400 {object} ErrorResponse
-// @Failure 404 {object} ErrorResponse
+// @Failure 400 {object} common.ErrorResponse
+// @Failure 404 {object} common.ErrorResponse
 // @Router /users/{id} [delete]
 func (h *Handler) handleDeleteUser(w http.ResponseWriter, r *http.Request) {
 	id, err := h.getIDFromURL(r)
 	if err != nil {
-		h.writeError(w, invalidUserIDMsg, http.StatusBadRequest)
+		h.WriteBadRequest(w, "invalid user ID")
 		return
 	}
 
 	err = h.service.DeleteUser(id)
 	if err != nil {
 		if err.Error() == ErrUserNotFound {
-			h.writeError(w, err.Error(), http.StatusNotFound)
+			h.WriteNotFound(w, err.Error())
 		} else {
-			h.writeError(w, err.Error(), http.StatusBadRequest)
+			h.WriteBadRequest(w, err.Error())
 		}
 		return
 	}
@@ -186,21 +180,8 @@ func (h *Handler) handleDeleteUser(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// getIDFromURL extracts the ID from URL parameters
+// getIDFromURL extracts the ID parameter from the URL
 func (h *Handler) getIDFromURL(r *http.Request) (int, error) {
-	vars := mux.Vars(r)
-	return strconv.Atoi(vars["id"])
-}
-
-// writeJSON writes a JSON response
-func (h *Handler) writeJSON(w http.ResponseWriter, data interface{}) {
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(data)
-}
-
-// writeError writes an error response
-func (h *Handler) writeError(w http.ResponseWriter, message string, statusCode int) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(statusCode)
-	json.NewEncoder(w).Encode(ErrorResponse{Error: message})
+	params := h.GetURLParams(r)
+	return params.Int("id")
 }

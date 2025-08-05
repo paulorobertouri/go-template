@@ -2,21 +2,24 @@ basePath: /
 definitions:
   calculator.Response:
     properties:
-      error:
-        type: string
       result:
         type: number
+    type: object
+  common.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  greeting.GreetingResponse:
+    properties:
+      message:
+        type: string
     type: object
   user.CreateUserRequest:
     properties:
       email:
         type: string
       name:
-        type: string
-    type: object
-  user.ErrorResponse:
-    properties:
-      error:
         type: string
     type: object
   user.User:
@@ -78,7 +81,7 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/calculator.Response'
+            $ref: '#/definitions/common.ErrorResponse'
       summary: Add two numbers
       tags:
       - calculator
@@ -108,10 +111,60 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/calculator.Response'
+            $ref: '#/definitions/common.ErrorResponse'
       summary: Divide two numbers
       tags:
       - calculator
+  /greeting/{name}:
+    get:
+      consumes:
+      - application/json
+      description: Returns a simple greeting message for the given name
+      parameters:
+      - description: Person's name
+        in: path
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/greeting.GreetingResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.ErrorResponse'
+      summary: Greet a person
+      tags:
+      - greeting
+  /greeting/formal/{name}:
+    get:
+      consumes:
+      - application/json
+      description: Returns a formal greeting message for the given name
+      parameters:
+      - description: Person's name
+        in: path
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/greeting.GreetingResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/common.ErrorResponse'
+      summary: Formal greeting
+      tags:
+      - greeting
   /health:
     get:
       consumes:
@@ -155,7 +208,7 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/calculator.Response'
+            $ref: '#/definitions/common.ErrorResponse'
       summary: Multiply two numbers
       tags:
       - calculator
@@ -185,7 +238,7 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/calculator.Response'
+            $ref: '#/definitions/common.ErrorResponse'
       summary: Subtract two numbers
       tags:
       - calculator
@@ -227,7 +280,7 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/user.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
       summary: Create a new user
       tags:
       - users
@@ -250,11 +303,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/user.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/user.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
       summary: Delete user by ID
       tags:
       - users
@@ -278,18 +331,18 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/user.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/user.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
       summary: Get user by ID
       tags:
       - users
     put:
       consumes:
       - application/json
-      description: Updates an existing user's information
+      description: Updates an existing user with the provided data
       parameters:
       - description: User ID
         in: path
@@ -312,11 +365,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/user.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/user.ErrorResponse'
+            $ref: '#/definitions/common.ErrorResponse'
       summary: Update user by ID
       tags:
       - users
