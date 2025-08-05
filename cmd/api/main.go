@@ -9,9 +9,16 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/paulo/go-template/internal/server"
+	_ "github.com/paulorobertouri/go-template/docs" // Import docs for swagger
+	"github.com/paulorobertouri/go-template/internal/server"
 )
 
+// @title Go Template API
+// @version 1.0
+// @description A simple Go API template with calculator and user management endpoints
+// @host localhost:8080
+// @BasePath /
+// @schemes http
 func main() {
 	// Create a new server instance
 	srv := server.New()
@@ -29,6 +36,7 @@ func main() {
 	// Start server in a goroutine
 	go func() {
 		log.Println("Starting server on :8080")
+		log.Println("Swagger UI available at: http://localhost:8080/swagger/")
 		if err := httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("Server failed to start: %v", err)
 		}

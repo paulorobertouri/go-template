@@ -1,0 +1,325 @@
+basePath: /
+definitions:
+  calculator.Response:
+    properties:
+      error:
+        type: string
+      result:
+        type: number
+    type: object
+  user.CreateUserRequest:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+    type: object
+  user.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  user.User:
+    properties:
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: A simple Go API template with calculator and user management endpoints
+  title: Go Template API
+  version: "1.0"
+paths:
+  /:
+    get:
+      consumes:
+      - application/json
+      description: Returns a welcome message for the API
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Welcome endpoint
+      tags:
+      - general
+  /add/{a}/{b}:
+    get:
+      consumes:
+      - application/json
+      description: Performs addition of two floating-point numbers
+      parameters:
+      - description: First number
+        in: path
+        name: a
+        required: true
+        type: number
+      - description: Second number
+        in: path
+        name: b
+        required: true
+        type: number
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/calculator.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/calculator.Response'
+      summary: Add two numbers
+      tags:
+      - calculator
+  /divide/{a}/{b}:
+    get:
+      consumes:
+      - application/json
+      description: Performs division of two floating-point numbers (a / b)
+      parameters:
+      - description: Dividend
+        in: path
+        name: a
+        required: true
+        type: number
+      - description: Divisor (cannot be zero)
+        in: path
+        name: b
+        required: true
+        type: number
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/calculator.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/calculator.Response'
+      summary: Divide two numbers
+      tags:
+      - calculator
+  /health:
+    get:
+      consumes:
+      - application/json
+      description: Returns the health status of the API
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Health check endpoint
+      tags:
+      - health
+  /multiply/{a}/{b}:
+    get:
+      consumes:
+      - application/json
+      description: Performs multiplication of two floating-point numbers
+      parameters:
+      - description: First number
+        in: path
+        name: a
+        required: true
+        type: number
+      - description: Second number
+        in: path
+        name: b
+        required: true
+        type: number
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/calculator.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/calculator.Response'
+      summary: Multiply two numbers
+      tags:
+      - calculator
+  /subtract/{a}/{b}:
+    get:
+      consumes:
+      - application/json
+      description: Performs subtraction of two floating-point numbers (a - b)
+      parameters:
+      - description: First number (minuend)
+        in: path
+        name: a
+        required: true
+        type: number
+      - description: Second number (subtrahend)
+        in: path
+        name: b
+        required: true
+        type: number
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/calculator.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/calculator.Response'
+      summary: Subtract two numbers
+      tags:
+      - calculator
+  /users:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a list of all users in the system
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/user.User'
+            type: array
+      summary: Get all users
+      tags:
+      - users
+    post:
+      consumes:
+      - application/json
+      description: Creates a new user with the provided name and email
+      parameters:
+      - description: User creation request
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/user.CreateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/user.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/user.ErrorResponse'
+      summary: Create a new user
+      tags:
+      - users
+  /users/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a user from the system
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/user.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/user.ErrorResponse'
+      summary: Delete user by ID
+      tags:
+      - users
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a specific user by their ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/user.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/user.ErrorResponse'
+      summary: Get user by ID
+      tags:
+      - users
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing user's information
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: User update request
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/user.CreateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/user.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/user.ErrorResponse'
+      summary: Update user by ID
+      tags:
+      - users
+schemes:
+- http
+swagger: "2.0"
