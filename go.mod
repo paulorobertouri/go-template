@@ -13,8 +13,6 @@ require (
 )
 
 require (
-	github.com/KyberNetwork/logrus-prefixed-formatter v0.0.0-20180807084957-14e5730f2e71 // indirect
-	github.com/KyberNetwork/structs v0.0.0-20180426143503-c51d4b2b2313 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
