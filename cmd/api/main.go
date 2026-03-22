@@ -9,8 +9,8 @@ import (
 	"syscall"
 	"time"
 
-	_ "github.com/paulorobertouri/go-template/docs" // Import docs for swagger
-	"github.com/paulorobertouri/go-template/internal/server"
+	_ "github.com/example/go-template/docs" // Import docs for swagger
+	"github.com/example/go-template/internal/server"
 )
 
 // @title Go Template API

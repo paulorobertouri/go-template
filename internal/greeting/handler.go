@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/paulorobertouri/go-template/internal/common"
+	"github.com/example/go-template/internal/common"
 )
 
 // GreetingResponse represents a greeting response
