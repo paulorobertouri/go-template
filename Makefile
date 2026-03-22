@@ -1,18 +1,16 @@
 .PHONY: install install-dev run test docker-build docker-test docker-curl-test clean help
 
 install:
-	go mod tidy
-	go mod download
+	./scripts/ubuntu/install.sh
 
 install-dev: install
-	go install github.com/cosmtrek/air@latest
-	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+	./scripts/ubuntu/install-dev.sh
 
 run:
-	go run main.go
+	./scripts/ubuntu/run.sh
 
 test:
-	go test -count=1 -v ./...
+	./scripts/ubuntu/test.sh
 
 test-coverage:
 	go test -count=1 -v -coverprofile=coverage.out ./...
@@ -26,7 +24,7 @@ docker-test:
 	docker run --rm go-template-test:latest
 
 docker-curl-test:
-	bash tests/docker/test_with_curl.sh
+	./scripts/ubuntu/docker-curl-test.sh
 
 clean:
 	go clean
@@ -34,10 +32,10 @@ clean:
 
 help:
 	@echo "Available targets:"
-	@echo "  make install        - Download dependencies"
-	@echo "  make install-dev    - Install dev tools"
-	@echo "  make run            - Run the application"
-	@echo "  make test           - Run tests"
+	@echo "  make install        - Download dependencies via Ubuntu script"
+	@echo "  make install-dev    - Install dev tools via Ubuntu script"
+	@echo "  make run            - Run the application via Ubuntu script"
+	@echo "  make test           - Run tests via Ubuntu script"
 	@echo "  make test-coverage  - Run tests with coverage report"
 	@echo "  make docker-build   - Build Docker image"
 	@echo "  make docker-test    - Build and run tests in Docker"
