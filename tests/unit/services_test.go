@@ -1,14 +1,16 @@
-package services
+package unit
 
 import (
 	"testing"
 
-	"github.com/example/go-template/internal/domain"
+	"github.com/example/go-template/internal/services"
 )
 
+const testUserSubject = "test-user"
+
 func TestIssueToken(t *testing.T) {
-	authService := NewAuthService()
-	token, err := authService.IssueToken("test-user")
+	authService := services.NewAuthService()
+	token, err := authService.IssueToken(testUserSubject)
 
 	if err != nil {
 		t.Fatalf("IssueToken failed: %v", err)
@@ -20,21 +22,21 @@ func TestIssueToken(t *testing.T) {
 }
 
 func TestValidateToken(t *testing.T) {
-	authService := NewAuthService()
-	token, _ := authService.IssueToken("test-user")
+	authService := services.NewAuthService()
+	token, _ := authService.IssueToken(testUserSubject)
 
 	claims, err := authService.ValidateToken(token)
 	if err != nil {
 		t.Fatalf("ValidateToken failed: %v", err)
 	}
 
-	if claims.Sub != "test-user" {
-		t.Errorf("Expected sub to be 'test-user', got %s", claims.Sub)
+	if claims.Sub != testUserSubject {
+		t.Errorf("Expected sub to be '%s', got %s", testUserSubject, claims.Sub)
 	}
 }
 
 func TestValidateInvalidToken(t *testing.T) {
-	authService := NewAuthService()
+	authService := services.NewAuthService()
 	_, err := authService.ValidateToken("invalid.token.here")
 
 	if err == nil {
@@ -43,15 +45,12 @@ func TestValidateInvalidToken(t *testing.T) {
 }
 
 func TestValidateTokenWithWrongSecret(t *testing.T) {
-	authService := NewAuthService()
-	token, _ := authService.IssueToken("test-user")
+	t.Setenv("JWT_SECRET", "your-super-secret-jwt-key-at-least-32-characters-long-for-hs256")
+	authService := services.NewAuthService()
+	token, _ := authService.IssueToken(testUserSubject)
 
-	// Create a new service with different secret
-	authServiceWithDifferentSecret := &AuthService{
-		secret:    "different-secret-key-at-least-32-characters-long-for-hs256",
-		algorithm: "HS256",
-		expiresIn: 3600,
-	}
+	t.Setenv("JWT_SECRET", "different-secret-key-at-least-32-characters-long-for-hs256")
+	authServiceWithDifferentSecret := services.NewAuthService()
 
 	_, err := authServiceWithDifferentSecret.ValidateToken(token)
 	if err == nil {
