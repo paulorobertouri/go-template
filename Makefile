@@ -1,88 +1,45 @@
-.PHONY: build run test test-coverage clean help
+.PHONY: install install-dev run test docker-build docker-test docker-curl-test clean help
 
-# Build variables
-BINARY_NAME=api
-BUILD_DIR=bin
+install:
+	go mod tidy
+	go mod download
 
-# Go parameters
-GOCMD=go
-GOBUILD=$(GOCMD) build
-GOCLEAN=$(GOCMD) clean
-GOTEST=$(GOCMD) test
-GOGET=$(GOCMD) get
-GOMOD=$(GOCMD) mod
+install-dev: install
+	go install github.com/cosmtrek/air@latest
+	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 
-# Default target
-all: test build
-
-# Build the application
-build:
-	@echo "Building $(BINARY_NAME)..."
-	@mkdir -p $(BUILD_DIR)
-	$(GOBUILD) -o $(BUILD_DIR)/$(BINARY_NAME) cmd/api/main.go
-
-# Run the application
 run:
-	@echo "Running the application..."
-	$(GOCMD) run cmd/api/main.go
+	go run main.go
 
-# Run tests
 test:
-	@echo "Running tests..."
-	$(GOTEST) -v ./...
+	go test -count=1 -v ./...
 
-# Run tests with coverage
 test-coverage:
-	@echo "Running tests with coverage..."
-	$(GOTEST) -v -cover ./...
-	$(GOTEST) -v -coverprofile=coverage.out ./...
-	$(GOCMD) tool cover -html=coverage.out -o coverage.html
-	@echo "Coverage report generated: coverage.html"
+	go test -count=1 -v -coverprofile=coverage.out ./...
+	go tool cover -html=coverage.out -o coverage.html
 
-# Run benchmarks
-bench:
-	@echo "Running benchmarks..."
-	$(GOTEST) -bench=. ./...
+docker-build:
+	docker build -f docker/build.Dockerfile -t go-template:latest .
 
-# Clean build artifacts
+docker-test:
+	docker build -f docker/test.Dockerfile -t go-template-test:latest .
+	docker run --rm go-template-test:latest
+
+docker-curl-test:
+	bash tests/docker/test_with_curl.sh
+
 clean:
-	@echo "Cleaning..."
-	$(GOCLEAN)
-	rm -rf $(BUILD_DIR)
-	rm -f coverage.out coverage.html
+	go clean
+	rm -rf coverage.out coverage.html
 
-# Download dependencies
-deps:
-	@echo "Downloading dependencies..."
-	$(GOMOD) download
-	$(GOMOD) tidy
-
-# Format code
-fmt:
-	@echo "Formatting code..."
-	$(GOCMD) fmt ./...
-
-# Lint code (requires golangci-lint)
-lint:
-	@echo "Linting code..."
-	golangci-lint run
-
-# Swagger generation
-swagger:
-	@echo "Generating Swagger documentation..."
-	~/go/bin/swag init -g cmd/api/main.go
-
-
-# Show help
 help:
 	@echo "Available targets:"
-	@echo "  build         - Build the application"
-	@echo "  run           - Run the application"
-	@echo "  test          - Run tests"
-	@echo "  test-coverage - Run tests with coverage report"
-	@echo "  bench         - Run benchmarks"
-	@echo "  clean         - Clean build artifacts"
-	@echo "  deps          - Download dependencies"
-	@echo "  fmt           - Format code"
-	@echo "  lint          - Lint code"
-	@echo "  help          - Show this help"
+	@echo "  make install        - Download dependencies"
+	@echo "  make install-dev    - Install dev tools"
+	@echo "  make run            - Run the application"
+	@echo "  make test           - Run tests"
+	@echo "  make test-coverage  - Run tests with coverage report"
+	@echo "  make docker-build   - Build Docker image"
+	@echo "  make docker-test    - Build and run tests in Docker"
+	@echo "  make docker-curl-test - Run curl integration tests in Docker"
+	@echo "  make clean          - Clean build artifacts"

@@ -1,53 +1,150 @@
-# Go Template Project
+# Go Template
 
-A simple and clean Golang REST API template demonstrating basic CRUD operations, calculator functionality, and modern API development practices.
-
-## Project Structure
-
-```text
-go-template/
-├── bin/
-│   └── api                      # Compiled binary (generated)
-├── cmd/
-│   └── api/
-│       └── main.go              # Main application entry point with graceful shutdown
-├── docs/                        # Swagger documentation (auto-generated)
-│   ├── docs.go                  # Swagger docs package
-│   ├── swagger.json             # OpenAPI JSON specification
-│   └── swagger.yaml             # OpenAPI YAML specification
-├── internal/
-│   ├── common/                  # Common framework for all handlers
-│   │   ├── handler.go           # Base handler with common methods
-│   │   ├── params.go            # URL parameter extraction helpers
-│   │   ├── response.go          # Standardized JSON response helpers
-│   │   └── router.go            # Route registration helpers
-│   ├── calculator/
-│   │   ├── calculator.go        # Calculator business logic
-│   │   ├── calculator_test.go   # Calculator unit tests
-│   │   └── routes.go            # Calculator HTTP routes and handlers
-│   ├── user/
-│   │   ├── user.go              # User service and in-memory storage
-│   │   ├── user_test.go         # User service unit tests
-│   │   └── routes.go            # User CRUD HTTP routes and handlers
-│   ├── greeting/                # Example endpoint implementation
-│   │   ├── handler.go           # Greeting handlers
-│   │   └── handler_test.go      # Greeting handler tests
-│   └── server/
-│       └── server.go            # HTTP server setup and route configuration
-├── go.mod                       # Go module definition
-├── go.sum                       # Go module checksums
-├── Makefile                     # Build automation and development tasks
-└── README.md                    # This file
-```
+A modern Go API template with JWT authentication, Swagger documentation, and comprehensive testing.
 
 ## Features
 
-- **Calculator API**: Basic arithmetic operations (add, subtract, multiply, divide) with validation
-- **User Management API**: Full CRUD operations for user management with in-memory storage
-- **Greeting API**: Simple greeting endpoints demonstrating easy endpoint creation patterns
-- **Swagger Documentation**: Auto-generated OpenAPI documentation with interactive UI
-- **Clean Architecture**: Modular, maintainable code structure with reusable components
-- **Common Framework**: Simplified handler patterns for rapid endpoint development
+- **FastAPI-style API** with v1 endpoints
+- **JWT Authentication** with configurable secret and algorithm
+- **Swagger/OpenAPI Documentation** at `/docs`
+- **Dependency Injection** with service/repository pattern
+- **Docker Support** with multi-stage builds
+- **Comprehensive Tests** (unit, e2e, docker integration)
+- **Cross-platform Scripts** (Ubuntu `.sh` and Windows `.ps1`)
+
+## API Routes
+
+- `GET /docs` - Swagger API documentation
+- `GET /v1/public` - Public endpoint
+- `GET /v1/customer` - Get customer (public)
+- `POST /v1/auth/login` - Login (returns JWT)
+- `GET /v1/private` - Private endpoint (requires JWT)
+
+## JWT Response Contract
+
+Login endpoint returns:
+```json
+{
+  "token": "eyJhbGc..."
+}
+```
+
+Headers:
+- `Authorization: Bearer <token>`
+- `X-JWT-Token: <token>`
+
+## Quick Start
+
+### Local Development
+
+```bash
+# Install dependencies
+make install
+make install-dev
+
+# Run the application
+make run
+
+# Run tests
+make test
+make test-coverage
+
+# View coverage
+open coverage.html
+```
+
+### Docker
+
+```bash
+# Build Docker image
+make docker-build
+
+# Run Docker image
+docker run -p 8000:8000 go-template:latest
+
+# Run tests in Docker
+make docker-test
+
+# Run docker+curl integration tests
+make docker-curl-test
+```
+
+## Environment Variables
+
+```
+PORT=8000
+JWT_SECRET=your-super-secret-jwt-key-at-least-32-characters-long-for-hs256
+JWT_ALGORITHM=HS256
+JWT_EXPIRATION=3600
+```
+
+## Project Structure
+
+```
+.
+├── main.go              # Entry point
+├── go.mod              # Module definition
+├── Makefile            # Build tasks
+├── .env                # Environment configuration
+├── docker/
+│   ├── build.Dockerfile      # Production build
+│   └── test.Dockerfile       # Testing build
+├── internal/
+│   ├── api/
+│   │   └── routes.go         # Route definitions
+│   ├── services/
+│   │   ├── auth_service.go   # JWT generation/validation
+│   │   └── customer_service.go
+│   ├── repositories/
+│   │   └── customer_repo.go
+│   ├── domain/
+│   │   └── models.go         # Data models
+│   ├── middleware/
+│   │   └── auth.go           # JWT middleware
+│   └── di/
+│       └── providers.go      # Dependency injection
+├── tests/
+│   ├── unit/
+│   │   └── services_test.go
+│   ├── e2e/
+│   │   └── api_test.go
+│   └── docker/
+│       ├── test_with_curl.sh
+│       └── test_with_curl.ps1
+└── scripts/
+    ├── ubuntu/
+    │   └── docker-curl-test.sh
+    └── windows/
+        └── docker-curl-test.ps1
+```
+
+## Architecture
+
+```
+HTTP Request
+    ↓
+API Layer (routes.go)
+    ↓
+Middleware (auth.go - JWT validation)
+    ↓
+Service Layer (services)
+    ↓
+Repository Layer (repositories)
+    ↓
+Domain Models (models.go)
+```
+
+## Testing
+
+- **Unit Tests**: Service isolation tests
+- **E2E Tests**: Full HTTP stack integration tests  
+- **Docker Tests**: Container-based curl integration tests
+
+Run all tests with `make test` or `make test-coverage`.
+
+## License
+
+MIT
 - **Graceful Shutdown**: Proper server lifecycle management with signal handling
 - **In-Memory Storage**: No external dependencies required for quick development and testing
 - **Comprehensive Testing**: Unit tests for all business logic and handlers
