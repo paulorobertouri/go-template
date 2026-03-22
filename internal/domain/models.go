@@ -1,5 +1,7 @@
 package domain
 
+import "time"
+
 // Customer represents a customer in the system
 type Customer struct {
 	ID    string
