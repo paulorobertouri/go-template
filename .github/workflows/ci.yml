@@ -29,7 +29,7 @@ jobs:
       - name: Download dependencies
         run: |
           go mod download
-          go mod download github.com/labstack/echo/v4 github.com/swaggo/echo-swagger github.com/swaggo/swag github.com/joho/godotenv github.com/golang-jwt/jwt/v5 github.com/stretchr/testify
+          go mod download github.com/labstack/echo/v4 github.com/swaggo/echo-swagger github.com/swaggo/swag github.com/joho/godotenv github.com/stretchr/testify
 
       - name: Vet
         run: go vet . ./internal/api ./internal/di ./internal/domain ./internal/middleware ./internal/repositories ./internal/services ./tests/e2e ./tests/unit
