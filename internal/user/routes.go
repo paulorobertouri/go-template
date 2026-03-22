@@ -3,8 +3,8 @@ package user
 import (
 	"net/http"
 
-	"github.com/gorilla/mux"
 	"github.com/example/go-template/internal/common"
+	"github.com/gorilla/mux"
 )
 
 // CreateUserRequest represents a user creation request

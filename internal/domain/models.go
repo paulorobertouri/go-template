@@ -35,7 +35,7 @@ type CustomerResponse struct {
 
 // TokenClaims represents JWT token claims
 type TokenClaims struct {
-	Sub string    `json:"sub"`
-	Iat int64     `json:"iat"`
-	Exp int64     `json:"exp"`
+	Sub string `json:"sub"`
+	Iat int64  `json:"iat"`
+	Exp int64  `json:"exp"`
 }

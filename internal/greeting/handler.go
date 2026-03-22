@@ -3,8 +3,8 @@ package greeting
 import (
 	"net/http"
 
-	"github.com/gorilla/mux"
 	"github.com/example/go-template/internal/common"
+	"github.com/gorilla/mux"
 )
 
 // GreetingResponse represents a greeting response

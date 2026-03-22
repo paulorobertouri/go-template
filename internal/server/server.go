@@ -3,11 +3,11 @@ package server
 import (
 	"net/http"
 
-	"github.com/gorilla/mux"
 	"github.com/example/go-template/internal/calculator"
 	"github.com/example/go-template/internal/common"
 	"github.com/example/go-template/internal/greeting"
 	"github.com/example/go-template/internal/user"
+	"github.com/gorilla/mux"
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 

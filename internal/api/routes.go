@@ -6,8 +6,8 @@ import (
 	"github.com/example/go-template/internal/di"
 	"github.com/example/go-template/internal/domain"
 	"github.com/example/go-template/internal/middleware"
-	echoSwagger "github.com/swaggo/echo-swagger"
 	"github.com/labstack/echo/v4"
+	echoSwagger "github.com/swaggo/echo-swagger"
 )
 
 // RegisterRoutes registers all API routes

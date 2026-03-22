@@ -1,4 +1,4 @@
-.PHONY: install install-dev run test docker-build docker-test docker-curl-test clean help
+.PHONY: install install-dev run test format docker-build docker-test docker-curl-test clean help
 
 install:
 	./scripts/ubuntu/install.sh
@@ -15,6 +15,9 @@ test:
 test-coverage:
 	go test -count=1 -v -coverprofile=coverage.out ./...
 	go tool cover -html=coverage.out -o coverage.html
+
+format:
+	./scripts/ubuntu/format.sh
 
 docker-build:
 	docker build -f docker/build.Dockerfile -t go-template:latest .
@@ -40,4 +43,5 @@ help:
 	@echo "  make docker-build   - Build Docker image"
 	@echo "  make docker-test    - Build and run tests in Docker"
 	@echo "  make docker-curl-test - Run curl integration tests in Docker"
-	@echo "  make clean          - Clean build artifacts"
+	@echo "  make format         - Format source code
+	@echo "  make clean          - Clean build artifacts""
