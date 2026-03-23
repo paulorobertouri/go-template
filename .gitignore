@@ -80,3 +80,5 @@ config.local.json
 # Debug files
 debug
 __debug_bin*
+
+pnpm-lock.yaml
