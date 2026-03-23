@@ -31,6 +31,19 @@ jobs:
           go mod download
           go mod download github.com/labstack/echo/v4 github.com/swaggo/echo-swagger github.com/swaggo/swag github.com/joho/godotenv github.com/stretchr/testify
 
+      - name: Require JWT secret
+        env:
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+        run: |
+          if [ -z "$JWT_SECRET" ]; then
+            echo "Repository secret JWT_SECRET is not set. Set it in Settings → Secrets.";
+            exit 1;
+          fi
+          if [ ${#JWT_SECRET} -lt 32 ]; then
+            echo "JWT_SECRET must be at least 32 characters long.";
+            exit 1;
+          fi
+
       - name: Vet
         run: go vet . ./internal/api ./internal/di ./internal/domain ./internal/middleware ./internal/repositories ./internal/services ./tests/e2e ./tests/unit
 
