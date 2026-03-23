@@ -21,7 +21,7 @@ func RegisterRoutes(e *echo.Echo, providers *di.Providers) {
 	e.GET("/v1/customer", handleGetCustomer(providers))
 
 	// Auth routes
-	e.POST("/v1/auth/login", handleLogin(providers))
+	e.GET("/v1/auth/login", handleLogin(providers))
 
 	// Protected routes (with JWT middleware)
 	protected := e.Group("")

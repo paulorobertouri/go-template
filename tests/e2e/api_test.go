@@ -37,7 +37,7 @@ func TestPublicEndpoint(t *testing.T) {
 func TestLoginEndpoint(t *testing.T) {
 	e := setupTestServer()
 
-	req := httptest.NewRequest(http.MethodPost, "/v1/auth/login", nil)
+	req := httptest.NewRequest(http.MethodGet, "/v1/auth/login", nil)
 	rec := httptest.NewRecorder()
 	e.ServeHTTP(rec, req)
 

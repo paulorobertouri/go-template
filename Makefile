@@ -1,23 +1,23 @@
 .PHONY: install install-dev run test format docker-build docker-test docker-curl-test clean help
 
 install:
-	./scripts/ubuntu/install.sh
+	bash ./scripts/ubuntu/install.sh
 
 install-dev: install
-	./scripts/ubuntu/install-dev.sh
+	bash ./scripts/ubuntu/install-dev.sh
 
 run:
-	./scripts/ubuntu/run.sh
+	bash ./scripts/ubuntu/run.sh
 
 test:
-	./scripts/ubuntu/test.sh
+	bash ./scripts/ubuntu/test.sh
 
 test-coverage:
 	go test -count=1 -v -coverprofile=coverage.out ./...
 	go tool cover -html=coverage.out -o coverage.html
 
 format:
-	./scripts/ubuntu/format.sh
+	bash ./scripts/ubuntu/format.sh
 
 docker-build:
 	docker build -f docker/build.Dockerfile -t go-template:latest .
@@ -27,7 +27,7 @@ docker-test:
 	docker run --rm go-template-test:latest
 
 docker-curl-test:
-	./scripts/ubuntu/docker-curl-test.sh
+	bash ./scripts/ubuntu/docker-curl-test.sh
 
 clean:
 	go clean
