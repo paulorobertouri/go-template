@@ -1,4 +1,8 @@
-.PHONY: install install-dev run test format docker-build docker-test docker-curl-test clean help
+build:
+	bash ./scripts/ubuntu/build.sh
+.PHONY: install install-dev run test format lint docker-build docker-test docker-curl-test clean help
+lint:
+	bash ./scripts/ubuntu/lint.sh
 
 install:
 	bash ./scripts/ubuntu/install.sh

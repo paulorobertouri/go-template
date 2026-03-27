@@ -1,0 +1,12 @@
+name: Dependabot
+
+on:
+  schedule:
+    - cron: '0 0 * * 0'
+
+jobs:
+  dependabot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dependabot placeholder
+        run: echo "Dependabot runs via GitHub's native integration."
