@@ -30,7 +30,8 @@ func TestPublicEndpoint(t *testing.T) {
 	assert.Equal(t, http.StatusOK, rec.Code)
 
 	var response domain.PublicResponse
-	json.Unmarshal(rec.Body.Bytes(), &response)
+	err := json.Unmarshal(rec.Body.Bytes(), &response)
+	assert.NoError(t, err)
 	assert.Equal(t, "This is a public endpoint", response.Message)
 }
 
@@ -44,7 +45,8 @@ func TestLoginEndpoint(t *testing.T) {
 	assert.Equal(t, http.StatusOK, rec.Code)
 
 	var response domain.LoginResponse
-	json.Unmarshal(rec.Body.Bytes(), &response)
+	err := json.Unmarshal(rec.Body.Bytes(), &response)
+	assert.NoError(t, err)
 	assert.NotEmpty(t, response.Token)
 
 	// Check headers
@@ -78,7 +80,8 @@ func TestPrivateEndpointWithAuth(t *testing.T) {
 	assert.Equal(t, http.StatusOK, rec.Code)
 
 	var response domain.PrivateResponse
-	json.Unmarshal(rec.Body.Bytes(), &response)
+	err := json.Unmarshal(rec.Body.Bytes(), &response)
+	assert.NoError(t, err)
 	assert.Equal(t, "This is a private endpoint", response.Message)
 	assert.Equal(t, "test-user", response.User)
 }
@@ -93,6 +96,7 @@ func TestCustomerEndpoint(t *testing.T) {
 	assert.Equal(t, http.StatusOK, rec.Code)
 
 	var response []domain.CustomerResponse
-	json.Unmarshal(rec.Body.Bytes(), &response)
+	err := json.Unmarshal(rec.Body.Bytes(), &response)
+	assert.NoError(t, err)
 	assert.NotEmpty(t, response)
 }
