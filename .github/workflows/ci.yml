@@ -31,6 +31,9 @@ jobs:
           go mod download
           go mod download github.com/labstack/echo/v4 github.com/swaggo/echo-swagger github.com/swaggo/swag github.com/joho/godotenv github.com/stretchr/testify
 
+      - name: Format check
+        run: test -z "$(gofmt -l .)"
+
       - name: Vet
         run: go vet . ./internal/api ./internal/di ./internal/domain ./internal/middleware ./internal/repositories ./internal/services ./tests/e2e ./tests/unit
 
@@ -39,3 +42,6 @@ jobs:
 
       - name: Build
         run: go build .
+
+      - name: Docker curl smoke test
+        run: bash ./tests/docker/test_with_curl.sh

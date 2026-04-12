@@ -10,6 +10,36 @@
       "label": "test:run",
       "type": "shell",
       "command": "go test -count=1 -v ./..."
+    },
+    {
+      "label": "build",
+      "type": "shell",
+      "command": "go build ./..."
+    },
+    {
+      "label": "lint",
+      "type": "shell",
+      "command": "go vet ./..."
+    },
+    {
+      "label": "format",
+      "type": "shell",
+      "command": "gofmt -w ."
+    },
+    {
+      "label": "docker:up",
+      "type": "shell",
+      "command": "docker compose up --build"
+    },
+    {
+      "label": "docker:down",
+      "type": "shell",
+      "command": "docker compose down"
+    },
+    {
+      "label": "docker:curl-test",
+      "type": "shell",
+      "command": "bash ./tests/docker/test_with_curl.sh"
     }
   ]
 }

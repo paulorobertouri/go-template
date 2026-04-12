@@ -22,6 +22,7 @@ Go API template using Echo with JWT authentication, Swagger docs, and automated 
 ## JWT Contract
 
 Login returns:
+
 - Body: `{"token":"..."}`
 - Header: `Authorization: Bearer <token>`
 - Header: `X-JWT-Token: <token>`
