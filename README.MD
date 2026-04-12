@@ -1,6 +1,6 @@
 # go-template
 
-Go API template using Echo with JWT authentication, Swagger docs, and automated tests.
+Production-ready Go API template using Echo with JWT authentication, Swagger docs, and automated tests.
 
 ## Stack
 

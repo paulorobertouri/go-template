@@ -8,7 +8,10 @@ container_id=$(docker run -d -p 19000:8000 go-template:latest)
 trap "docker rm -f $container_id" EXIT
 
 # Wait for server to be ready
-sleep 2
+sleep 4
+
+# Test docs endpoint
+curl -fsS http://127.0.0.1:19000/docs/index.html > /dev/null
 
 # Test public endpoint
 curl -fsS http://127.0.0.1:19000/v1/public > /dev/null

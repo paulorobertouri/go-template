@@ -11,7 +11,6 @@ FROM alpine:3.18
 WORKDIR /app
 RUN apk --no-cache add ca-certificates
 COPY --from=builder /app/app .
-COPY .env .
 
 ENV PORT=8000
 EXPOSE 8000
